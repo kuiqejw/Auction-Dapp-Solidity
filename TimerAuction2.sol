@@ -4,7 +4,7 @@ contract TimerAuction{
     //static 
     address public owner;
     string public itemDesc;
-    //uint public auctionEnd;
+    uint public auctionEnd;
     
     //state
     address public maxBidder;
@@ -22,7 +22,7 @@ contract TimerAuction{
     constructor(string _itemDesc) public{
         owner = msg.sender;
         itemDesc = _itemDesc;
-        //auctionEnd = now + (_durationMinutes * 1 minutes);
+        auctionEnd = now + (_durationMinutes * 1 minutes);
     }
     
     function getHighestBid() constant public returns(uint) {
@@ -33,10 +33,10 @@ contract TimerAuction{
         return maxBidder;
     }
     function bid() public payable returns(uint){
-        //require(now > auctionEnd, "Auction is closed");
+        require(now > auctionEnd, "Auction is closed");
         require(msg.value >= 0, 'Your bid has to be higher than 0');
         //if all the requirements above are satisfied then we invoke this
-        
+
         //total bid = current amount that they've sent to the contract plus whatever has been sent with this transaction
         uint newBid = pendingReturns[msg.sender] + msg.value;
         require(newBid > maxBid, "Sorry, your bid value is too little!");
@@ -79,7 +79,7 @@ contract TimerAuction{
         require(msg.sender == owner);
         require(!ended);
         require(!cancelled);
-        //require(now >= auctionEnd);
+        require(now >= auctionEnd);
         cancelled = true;
         return true;
         
@@ -92,7 +92,7 @@ contract TimerAuction{
     function end() ownerOnly external {
         require(!ended);
         require(!cancelled);
-        //require(now >= auctionEnd);
+        require(now >= auctionEnd);
         
         ended = true;
         
