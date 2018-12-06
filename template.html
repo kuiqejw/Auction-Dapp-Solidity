@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Auction</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/blocks.png') }}">
+        <!-- See if a favicon may be added, on the LHS of the tab.-->
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}" />
+        <script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/skel.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+
+        <script lang="javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script lang="javascript">
+            var contract;
+
+            $(document).ready(function() {
+                if (typeof web3 !== 'undefined') {
+                    var sc_address = "{{contractAddress}}";
+                    var contractABI = web3.eth.contract(JSON.parse('{{contractABI | safe}}'));
+                    var contractInstance = contractABI.at(sc_address);
+                    contract = contractInstance;
+                    $("a#bid").click(function(){
+                        contractInstance.bid({from:web3.eth.accounts[0]},function(error, result){
+                          if (error) {
+                              alert("Error has occured",error);
+                              reject(error);
+                          } else {
+                              $("span#highest_bid").text(result[1]);
+                          }
+                        });
+                    });
+                    $("a#withdraw").click(function(){
+                        contractInstance.withdraw(function(error, result){
+                          if (error) {
+                              alert("Please, connect to Rinkeby network");
+                              reject(error);
+                          } else {
+                              if (result[0]){
+                                alert("Successfully withdrawn")
+                              }else{
+                                alert('Please try again. This failed')
+                              }
+                            $("span#highest_bid").text(result[1]);
+                          }
+                        });
+                    });
+                    $("a#end_Auction").click(function(){
+                        contractInstance.auctionEnd({from:web3.eth.accounts[0]}, function(error, result){
+                          if (error) {
+                              alert("Please, connect to Rinkeby network");
+                              reject(error);
+                          }
+                          else{
+                            alert("Auction has ended")
+                          }
+                        });
+                    });
+                }
+                else {
+                    alert("Please, install Metamask!");
+                }
+            });
+        </script>
+    </head>
+    <body class="subpage">
+      <!-- Header -->
+        <header id="header">
+          <div class="inner">
+
+            <!--<a href="index.html" class="logo">EthBay</a>-->
+            <nav id="nav">
+              <a href="index.html">Home</a>
+              <a href="#">Admin</a>
+              <a href="#">Customer</a>
+            </nav>
+            <a href="#navPanel" class="navPanelToggle"><span class="fa fa-bars"></span></a>
+            <!--Image addition here, Diamond and Bid sign next to Header Title-->
+            <img src="static/images/ether.png" alt="Ether Diamond" height="150" width="100" style = "padding-bottom:2px; margin-right:1050px;margin-top:33px">
+            <img src="static/images/bid.jpg" alt="bid icon" height="150" width="100" style = "padding-bottom:0 2px;margin-right:90px;margin-bottom: 20px">
+          </div>
+        </header>
+
+        <section id="three" class="wrapper">
+          <div class="inner">
+            <header class="align-center">
+              
+              <h2>Sample Ethereum Auction House</h2>
+            </header>
+            <div class="flex flex-2">
+              <article>
+                      <header>
+                  <h3>LatestBids</h3>
+                </header>
+                <p><span id="highest_bid">0</span><p>
+                            <p>Value of Bid: <input type="text" id="bid_value" value="0" /></p>
+                <footer>
+                  <a href="#" id="bid" class="button special">Bid</a>
+                </footer>
+
+                            <br />
+                <footer>
+                  <a href="#" id="withdraw" class="button special">Withdraw</a>
+                </footer>
+                            <br />
+                            <header>
+                  <h3>End Auction</h3>
+                </header>
+                <footer>
+                  <a href="#" id="end_Auction" class="button special">End Auction</a>
+                </footer>
+              </article>
+            </div>
+          </div>
+        </section>
+
+
+    </body>
+</html>

@@ -22,7 +22,7 @@ Auction = w3.eth.contract(abi=contract_interface['abi'],
                           bytecode=contract_interface['bin'])
 
 w3.personal.unlockAccount(w3.eth.accounts[0], '')
-tx_hash = Auction.constructor(10000,w3.eth.accounts[0]).transact({'from':w3.eth.accounts[0],})
+tx_hash = Auction.constructor(w3.eth.accounts[0]).transact({'from':w3.eth.accounts[0],})
 tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
 
 # Contract Object
