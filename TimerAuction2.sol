@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.25;
 
 contract TimerAuction{
     //static 
@@ -29,20 +29,18 @@ contract TimerAuction{
         return pendingReturns[maxBidder];
     }
     
-    function getHighestBidder() public payable returns(address){
-        require(msg.value == 1 ether, "you must pay to execute this");
+    function getHighestBidder() view public returns(address){
         return maxBidder;
     }
-    function bid(uint bid_value) public payable returns(uint){
+    function bid() public payable returns(uint){
         //require(now > auctionEnd, "Auction is closed");
-        require(bid_value >= 0, 'Your bid has to be higher than 0');
-        require(msg.value == bid_value);
+        require(msg.value >= 0, 'Your bid has to be higher than 0');
         //if all the requirements above are satisfied then we invoke this
         
         //total bid = current amount that they've sent to the contract plus whatever has been sent with this transaction
-        uint newBid = pendingReturns[msg.sender] + bid_value * 1 ether;
+        uint newBid = pendingReturns[msg.sender] + msg.value;
         require(newBid > maxBid, "Sorry, your bid value is too little!");
-        if(msg.sender != maxBidder){ //buyeraddress.send/transfer
+        if(msg.sender != maxBidder){ 
             prevMaxBidder = maxBidder;
             pendingReturns[msg.sender] = newBid;
             maxBidder = msg.sender;
