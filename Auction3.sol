@@ -33,10 +33,12 @@ contract AuctionHouse{
         owner = msg.sender;
     }
    // our setter in this case
-    function create(string _n) public returns(uint) {
+    function createAuction(string _n, uint minBid, uint time) public returns(uint) {
         Item memory i;
         i.itemDesc = _n;
         i.itemOwner = msg.sender;
+        i.maxBid = minBid;
+        i.auctionEnd = now + time * 1 minutes;
         //Item[] storage _l = list[msg.sender];
         //_l.push(i);
         idGenerator += 1;
@@ -94,8 +96,9 @@ contract AuctionHouse{
         Item memory i;
         i = idList[uniq_id];
         require(msg.sender == idList[uniq_id].itemOwner,"You cannot end the auction if you are not the owner");
-        require(!i.cancelled, "This auction has been cancelled with penalty. You can't end it!");
+        require(!i.cancelled, "This auction has been cancelled with penalty. You cant end it!");
         require(!i.ended, "this auction has already ended. ");
+        //require(now < i.auctionEnd, "This auction has yet to end.");
         i = idList[uniq_id];
         i.ended = true;
         msg.sender.transfer(i.maxBid);
