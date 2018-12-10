@@ -24,12 +24,14 @@
                     var contractInstance = contractABI.at(sc_address);
                     contract = contractInstance;
                     $("a#bid").click(function(){
-                        contractInstance.bid({from:web3.eth.accounts[0]},function(error, result){
+                      alert("CLICK!!!");
+                      var input = $("input#bid_value").val();
+                        contractInstance.bid({value:web3.toWei(input, "ether"),from:web3.eth.accounts[0]},function(error, result){
                           if (error) {
                               alert("Error has occured",error);
                               reject(error);
                           } else {
-                              $("span#highest_bid").text(result[1]);
+                              $("span#highest_bid").text(result);
                           }
                         });
                     });
@@ -120,3 +122,4 @@
 
     </body>
 </html>
+  
