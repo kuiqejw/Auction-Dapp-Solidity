@@ -12,7 +12,7 @@
         <script src="{{ url_for('static', filename='assets/js/skel.min.js') }}"></script>
         <script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
         <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
-
+        <script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/currency.js"></script>
         <script lang="javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script lang="javascript">
             var contract;
@@ -23,22 +23,39 @@
                     var contractABI = web3.eth.contract(JSON.parse('{{contractABI | safe}}'));
                     var contractInstance = contractABI.at(sc_address);
                     contract = contractInstance;
+                    var createEvent = contract.newAuctionCreated();
+                    createEvent.watch(function(error, result){
+                      if (!error){
+                        var str = '<tr class = "boxType">\
+                                    <th>' +result.args.owner+'</th>\
+                                    <th>'+result.args.itemDesc + '</th>\
+                                    <th>' + result.args.maxBid+'</th>\
+                                    <th>'+ result.args.maxBidder  +'</th>\
+                                    <th>'+result.args.ix+'</th>\
+                                    </tr>';
+                        $('#screen').append(str);
+                      }
+
+                    })
                     $("a#bid").click(function(){
-                      alert("CLICK!!!");
+                      alert("Launch bid");
                       var input = $("input#bid_value").val();
-                        contractInstance.bid({value:web3.toWei(input, "ether"),from:web3.eth.accounts[0]},function(error, result){
+                      var idex = $("input#item_index").val();
+                        contractInstance.bid(idex,{value:web3.toWei(input, "ether"),from:web3.eth.accounts[0]},function(error, result){
                           if (error) {
-                              alert("Error has occured",error);
+                              alert("Bid has not gone through", error);
                               reject(error);
                           } else {
-                              $("span#highest_bid").text(result);
+                              $("span#highest_bid").text(result); //insert update to table here instead. 
                           }
                         });
                     });
                     $("a#withdraw").click(function(){
-                        contractInstance.withdraw(function(error, result){
+                      var idex = $("input#item_index").val();
+                      //alert("Withdrawal can only be done after auction has ended!");
+                        contractInstance.withdraw(idex,function(error, result){
                           if (error) {
-                              alert("Please, connect to Rinkeby network");
+                              alert("Withdrawal is not allowed unless auction has ended. ");
                               reject(error);
                           } else {
                               if (result[0]){
@@ -46,18 +63,31 @@
                               }else{
                                 alert('Please try again. This failed')
                               }
-                            $("span#highest_bid").text(result[1]);
+                            //$("span#highest_bid").text(result[1]);
                           }
                         });
                     });
                     $("a#end_Auction").click(function(){
-                        contractInstance.auctionEnd({from:web3.eth.accounts[0]}, function(error, result){
+                      var idex = $("input#item_index").val();
+                        contractInstance.endAuction(idex,{from:web3.eth.accounts[0]}, function(error, result){
                           if (error) {
-                              alert("Please, connect to Rinkeby network");
+                              alert("Are you the owner?");
                               reject(error);
                           }
                           else{
                             alert("Auction has ended")
+                          }
+                        });
+                    });
+                    $("a#cancel_Auction").click(function(){
+                      var idex = $("input#item_index").val();
+                        contractInstance.cancelAuction(idex,{value:web3.toWei(0.5, "ether"),from:web3.eth.accounts[0]}, function(error, result){
+                          if (error) {
+                              alert("Are you the owner? ");
+                              reject(error);
+                          }
+                          else{
+                              alert("Auction has ended")
                           }
                         });
                     });
@@ -67,6 +97,25 @@
                 }
             });
         </script>
+        <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            border-collapse: collapse;
+          }
+
+          tr:nth-child(even) {
+            background-color: #dddddd;
+          }
+        </style>
     </head>
     <body class="subpage">
       <!-- Header -->
@@ -75,8 +124,8 @@
 
             <!--<a href="index.html" class="logo">EthBay</a>-->
             <nav id="nav">
-              <a href="index.html">Home</a>
-              <a href="#">Admin</a>
+              <a href="#">Home</a>
+              <a href="create">Create</a>
               <a href="#">Customer</a>
             </nav>
             <a href="#navPanel" class="navPanelToggle"><span class="fa fa-bars"></span></a>
@@ -91,17 +140,29 @@
             <header class="align-center">
               
               <h2>Sample Ethereum Auction House</h2>
+
             </header>
             <div class="flex flex-2">
               <article>
-                      <header>
+                  <header>
                   <h3>LatestBids</h3>
-                </header>
-                <p><span id="highest_bid">0</span><p>
+                  </header>
+                <table id = 'table_bid'>
+                  <tr>
+                    <th> Item ID</th>
+                    <th> Item Name </th>
+                    <th> Last bid value </th>
+                    <th> Highest Bidder </th>
+                    <th> Owner's address </th>
+                 <p><span id="bid_index">0</span><p>
+                            <p>Index of item: <input type="text" id="item_index" value="0" /></p>
+                            <br />
                             <p>Value of Bid: <input type="text" id="bid_value" value="0" /></p>
                 <footer>
                   <a href="#" id="bid" class="button special">Bid</a>
                 </footer>
+                        <br /> 
+                  <div class="coinmarketcap-currency-widget" data-currencyid="1027" data-base="SGD"  data-secondary="USD"></div>
 
                             <br />
                 <footer>
@@ -113,6 +174,11 @@
                 </header>
                 <footer>
                   <a href="#" id="end_Auction" class="button special">End Auction</a>
+                </footer>
+
+                            <br />
+                <footer>
+                  <a href="#" id="cancel_Auction" class="button special">Cancel Auction</a>
                 </footer>
               </article>
             </div>
