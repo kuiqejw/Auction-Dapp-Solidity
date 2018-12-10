@@ -30,11 +30,14 @@
                       var timeTaken = $("input#txt_time").val();
                         contractInstance.createAuction(name,minBid,timeTaken,function(error, result){
                           if (error) {
-                              alert("Auction has not gone through. ",error);
-                              reject(error);
+                              alert(error);
                           } else {
-                              $("span#highest_bid").text(result);
-                              alert("Your item index is ", result)
+                            console.log(result);
+                            var number = web3.toBigNumber(result);  
+                            console.log(number);
+                            console.log(number.toString())
+                            $("span#number").text(number.);
+                            document.getElementById("number").style.display = "block";
                           }
                         });
                     });
@@ -53,7 +56,7 @@
             <!--<a href="index.html" class="logo">EthBay</a>-->
             <nav id="nav">
               <a href="index">Home</a>
-              <a href="create.html">Create</a>
+              <a href="create">Create</a>
               <a href="#">Customer</a>
             </nav>
             <a href="#navPanel" class="navPanelToggle"><span class="fa fa-bars"></span></a>
@@ -73,7 +76,9 @@
               <article>
                 <header>
                   <h3>Create Form</h3>
+                  <p><span id="number" style="display:none;">0</span><p>
                 </header>
+
                   <p>Name of Item: <input type="text" id="txt_name" value="" /></p>
                                             <br />
                 <footer>

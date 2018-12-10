@@ -23,6 +23,26 @@
                     var contractABI = web3.eth.contract(JSON.parse('{{contractABI | safe}}'));
                     var contractInstance = contractABI.at(sc_address);
                     contract = contractInstance;
+                    var createEvent = contract.newAuctionCreated();
+                    createEvent.watch(function(error, result){
+                      if (!error){
+                        var table = document.getElementById("table_bid");
+                        alert('update table now');
+                        var row = table.insertRow(1);
+                        var cell1 = row.insertCell(0);
+                        cell1.innerHTML = result.args.ix;
+                        var cell2 = row.insertCell(1);
+                        cell2.innerHTML = result.args.itemDesc;
+                        var cell3 = row.insertCell(2);
+                        cell3.innerHTML = result.args.maxBid;
+                        var cell4 = row.insertCell(3);
+                        cell4.innerHTML = result.args.maxBidder;
+                        var cell5 = row.insertCell(4);
+                        cell5.innerHTML = result.args.owner;
+                        
+                      }
+
+                    });
                     $("a#bid").click(function(){
                       alert("Launch bid");
                       var input = $("input#bid_value").val();
@@ -83,6 +103,25 @@
                 }
             });
         </script>
+        <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            border-collapse: collapse;
+          }
+
+          tr:nth-child(even) {
+            background-color: #dddddd;
+          }
+        </style>
     </head>
     <body class="subpage">
       <!-- Header -->
@@ -107,12 +146,22 @@
             <header class="align-center">
               
               <h2>Sample Ethereum Auction House</h2>
+
             </header>
             <div class="flex flex-2">
               <article>
-                      <header>
+                  <header>
                   <h3>LatestBids</h3>
-                </header>
+                  </header>
+                <table id = 'table_bid'>
+                  <tr>
+                    <th> Item ID</th>
+                    <th> Item Name </th>
+                    <th> Last bid value </th>
+                    <th> Highest Bidder </th>
+                    <th> Owner's address </th>
+                  </tr>
+                </table>
                  <p><span id="bid_index">0</span><p>
                             <p>Index of item: <input type="text" id="item_index" value="0" /></p>
                             <br />

@@ -3,7 +3,7 @@ pragma solidity ^0.4.25;
 contract AuctionHouse{
     //static owner of the contract
     address public owner;
-    uint256 idGenerator;
+    uint idGenerator = 0;
 
     struct Item {
         address itemOwner;
@@ -11,6 +11,7 @@ contract AuctionHouse{
         uint auctionEnd;
         address  maxBidder;
         uint maxBid;
+        uint minBid;
         //state
         bool ended;
         bool ownerHasWithdrawn;
@@ -23,7 +24,9 @@ contract AuctionHouse{
    
     //time implemented if  possible
     uint time;
-
+    event newAuctionCreated(address owner, string itemDesc, uint maxBid, address maxBidder, uint ix);
+    event auctionUpdated(address owner, string itemDesc, uint maxBid, address maxBidder, uint ix);
+    event removeContract(uint ix);
     //treat this for reference for the user
     //mapping(address => Item[]) list;
     mapping(uint256 => Item) idList;
@@ -33,16 +36,18 @@ contract AuctionHouse{
         owner = msg.sender;
     }
    // our setter in this case
+   
     function createAuction(string _n, uint minBid, uint time) public returns(uint) {
         Item memory i;
         i.itemDesc = _n;
         i.itemOwner = msg.sender;
-        i.maxBid = minBid;
+        i.minBid = minBid;
         i.auctionEnd = now + time * 1 minutes;
         //Item[] storage _l = list[msg.sender];
         //_l.push(i);
         idGenerator += 1;
         idList[idGenerator] = i;
+        newAuctionCreated(msg.sender, _n, minBid,msg.sender, idGenerator);
         return idGenerator;
     }
    //our getter in this case
@@ -69,6 +74,7 @@ contract AuctionHouse{
         //total bid = current amount that they've sent to the contract plus whatever has been sent with this transaction
         i = idList[uniq_id];
         uint newBid = msg.value;
+        require(newBid > i.minBid, "It is lower than initial price. Try again!");
         require(newBid > i.maxBid, "Sorry, your bid value is too little!");
         if(msg.sender != i.maxBidder){//why are you paying more?
             i.maxBidder = msg.sender;
@@ -76,6 +82,7 @@ contract AuctionHouse{
         }
         //get the new value of maxBid to be bid_value
         idList[uniq_id] = i;
+        auctionUpdated(i.itemOwner,i.itemDesc, i.maxBid, i.maxBidder, uniq_id);
         return newBid;
     }
     //returns cash upon successful bid; based off withdrawal design patterns in readthedocs
