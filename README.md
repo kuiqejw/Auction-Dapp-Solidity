@@ -11,6 +11,23 @@ python3 -m solc.install v0.4.25
 export PATH=$HOME/.py-solc/solc-v0.4.25/bin:$PATH
 python3 server.py
 
+## Grades for this Project: 
+30/30: 
+Based on:
+DApp Project - final
+
+Type 	Auction
+On time 	X
+Docs 	X
+Code 	X
+Web and UX 	X
+Dynamic price 	X
+Payments (tokens and/or metamask) 	X
+Solidity features (modifiers, events,.. etc) 	X
+Gas analysis and optimized 	X
+Notes 	- confusing value in ETHs shown in the table(should be in fiat money as well)
+
+...On second thought, maybe ETH was a better idea???
 
 ## About the Other Files?
 Sorry, I haven't gotten around to deleting them that. Watch this space!
