@@ -17,14 +17,14 @@ Based on:
 DApp Project - final
 
 Type 	Auction
-On time 	X
-Docs 	X
-Code 	X
-Web and UX 	X
-Dynamic price 	X
-Payments (tokens and/or metamask) 	X
-Solidity features (modifiers, events,.. etc) 	X
-Gas analysis and optimized 	X
+1. On time 	X
+2. Docs 	X
+3. Code 	X
+4. Web and UX 	X
+5. Dynamic price 	X
+6. Payments (tokens and/or metamask) 	X
+7. Solidity features (modifiers, events,.. etc) 	X
+8. Gas analysis and optimized 	X
 Notes 	- confusing value in ETHs shown in the table(should be in fiat money as well)
 
 ...On second thought, maybe ETH was a better idea???
